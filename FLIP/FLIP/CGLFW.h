@@ -6,8 +6,8 @@ class GLFW
 {
 public:
 	GLFWwindow* window = nullptr;
-	unsigned int scr_width = 600;
-	unsigned int scr_height = 600;
+	unsigned int scr_width = 1280;
+	unsigned int scr_height = 720;
 	bool isStart = false;
 	
 	int init();

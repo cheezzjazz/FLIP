@@ -149,13 +149,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CGLFW.cpp" />
+    <ClCompile Include="CGrid.cpp" />
+    <ClCompile Include="CParticle.cpp" />
     <ClCompile Include="CShader.cpp" />
+    <ClCompile Include="CSolver.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Array2.h" />
     <ClInclude Include="CGLFW.h" />
+    <ClInclude Include="CGrid.h" />
+    <ClInclude Include="CParticle.h" />
     <ClInclude Include="CShader.h" />
+    <ClInclude Include="CSolver.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
