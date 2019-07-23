@@ -11,20 +11,18 @@ Solver::Solver(int gridsize)
 
 Solver::~Solver()
 {
-	if(particles != NULL)
-		delete particles;
-	if(grid != NULL)
-		delete grid;
+	if(m_particles != NULL)
+		delete m_particles;
+	if(m_grid != NULL)
+		delete m_grid;
 }
 
 void Solver::init(int gridsize_)
 {
-	Grid grid(9.8, gridsize_, gridsize_, 1);
-	this->grid = &grid;
-	Particle particles(grid);
-	this->particles = &particles;
+	m_grid = new Grid(9.8, gridsize_, gridsize_, 1);
+	m_particles = new Particle(*m_grid);
 
-	init_water_drop(grid, particles, 2, 2);
+	init_water_drop(*m_grid, *m_particles, 2, 2);
 }
 
 void Solver::init(int gridsize_, Grid &grid_, Particle &particles_)
@@ -38,13 +36,31 @@ void Solver::update()
 {
 }
 
+void Solver::update(float *ptr, float * vertices)
+{
+	if (!ptr || !vertices)
+		return;
+
+	stepFLIP();
+
+	for (int p = 0; p < m_particle_count; p++)
+	{
+		*vertices = m_particles->x[p][0];
+		*ptr = *vertices;
+		std::cout << "[x," << p << "] = " << *ptr << "," << *vertices << std::endl; ++ptr; ++vertices;
+		*vertices = m_particles->x[p][1];
+		*ptr = *vertices;
+		std::cout << "[y," << p << "] = " << *ptr << "," << *vertices << std::endl; ++ptr; ++vertices;
+	}
+}
+
 void Solver::stepPIC()
 {
 }
 
 void Solver::stepFLIP()
 {
-	advance_one_frame(*grid, *particles, 1. / 30);
+	advance_one_frame(*m_grid, *m_particles, 1./30);
 }
 
 void Solver::stepPICFLIP()
@@ -68,7 +84,7 @@ void Solver::project(Grid &grid, float &x, float &y, float current, float target
 void Solver::init_water_drop(Grid & grid, Particle & particles, int na, int nb)
 {
 	float x, y, phi;
-
+	
 	for (int i = 1; i < grid.marker.nx - 1; i++)	//except for boundary
 	{
 		for (int j = 1; j < grid.marker.ny - 1; j++)
@@ -98,6 +114,7 @@ void Solver::init_water_drop(Grid & grid, Particle & particles, int na, int nb)
 
 void Solver::advance_one_frame(Grid & grid, Particle & particles, double frametime)
 {
+	m_particle_count = 0;
 	double t = 0;
 	double dt;
 	bool finished = false;
@@ -108,6 +125,7 @@ void Solver::advance_one_frame(Grid & grid, Particle & particles, double frameti
 		{
 			dt = frametime - t;
 			finished = true;
+			m_particle_count = particles.num;
 		}
 		else if (t + 1.5*dt >= frametime)
 		{

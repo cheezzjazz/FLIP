@@ -7,8 +7,45 @@
 #include "CGLFW.h"
 #include "CSolver.h"
 
-#define PARTICLE_COUNTS 10
 #define GRID_SIZE 20
+void updateVertices(float* mappedbuffer, float* srcvertices, int count)
+{
+	if (!mappedbuffer || !srcvertices)
+	{
+		std::cout << "ERROR::UPDATEVERTICES:: DATA Pointer is NULL" << std::endl;
+		return;
+	}
+	float diff = 0.01f;
+	//diff += 0.1f;
+	std::cout << diff << std::endl;
+	for (int i = 0; i < count; i++)
+	{
+		//float x, y;
+		//x = *srcvertices; srcvertices++;
+		//y = *srcvertices; srcvertices++;
+		//std::cout << "x=" << x << "y=" << y;
+		////float diff = 0.008f;
+		//mappedbuffer[2*i] = x + diff;
+		//srcvertices[2 * i] = mappedbuffer[2 * i];
+		////mappedbuffer++;
+		//mappedbuffer[2*i+1] = y + diff;
+		//srcvertices[2 * i] = mappedbuffer[2 * i];
+		//std::cout << "map[" << 2 * i << "]=" << mappedbuffer[2 * i] << "map[" << 2 * i + 1 << "]=" << mappedbuffer[2 * i + 1] << std::endl;
+		////mappedbuffer++;
+		////update vertex coords
+		*srcvertices += diff;
+		*mappedbuffer = *srcvertices; std::cout << "x:" << *mappedbuffer;
+		++srcvertices; ++mappedbuffer;
+		*srcvertices += diff;
+		*mappedbuffer = *srcvertices + diff; std::cout << "y:" << *mappedbuffer<<std::endl;
+		++srcvertices; ++mappedbuffer;
+		//*srcvertices += diff;
+		//*mappedbuffer = *srcvertices; std::cout << "z:" << *mappedbuffer << std::endl;
+		//++srcvertices; ++mappedbuffer;
+	}
+
+
+}
 
 int main()
 {
@@ -18,16 +55,18 @@ int main()
 	ourGlfw.setWindowTitle("FLIP 2D");
 	ourGlfw.init();
 	
-	float* vertices = new float[PARTICLE_COUNTS * 2];	//2 means x, y
-	for (int i = 0; i < PARTICLE_COUNTS; i++)
-	{
-		vertices[2 * i] = 0.8f - 0.2f*i;
-		vertices[2 * i + 1] = 0.5f  - 0.2f*i;
-	}
-
 	//FLIP INIT
 	Solver ourSolver(GRID_SIZE);
-	
+	int particlecnt = 0;
+	particlecnt = ourSolver.m_particles->num;
+	std::cout << "frame : particle count : " << particlecnt << std::endl;
+	float* vertices = new float[particlecnt * 2];	//2 means x, y
+	for (int i = 0; i < particlecnt; i++)
+	{
+		vertices[2 * i] = 0.0f + 0 ;
+		vertices[2 * i + 1] = 0.0f;
+	}
+
 
 	//Create Shader
 	Shader ourShader("./Shader/VertexShader.glsl", "./Shader/FragmentShader.glsl");
@@ -37,7 +76,7 @@ int main()
 	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*particlecnt*sizeof(float), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -48,9 +87,11 @@ int main()
 	glBindVertexArray(VAO);
 	
 	//draw buffer
-	int nFrame = 500;
-	while (!ourGlfw.getWindowShouldClose() || nFrame == 0)
+	int nFrame = 100;
+	while (!ourGlfw.getWindowShouldClose() && nFrame != 0)
 	{
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 		std::cout << "Frame [" << nFrame << "] \n";
 
 		ourGlfw.processInput();
@@ -60,12 +101,14 @@ int main()
 		float * ptr = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 		if (ptr)
 		{
-			ourSolver.stepFLIP();
+			//ourSolver.stepFLIP();
+			ourSolver.update(ptr, vertices);
+			//updateVertices(ptr, vertices, particlecnt);
 			glUnmapBuffer(GL_ARRAY_BUFFER);
 		}
 
 		glPointSize(5.0f);
-		//glDrawArrays(GL_POINTS, 0, PARTICLE_COUNTS);
+		glDrawArrays(GL_POINTS, 0, particlecnt);
 	
 		ourGlfw.swapBuffers();
 		
