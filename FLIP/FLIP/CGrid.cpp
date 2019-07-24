@@ -281,14 +281,15 @@ void Grid::form_poisson()
 				if (marker(i + 1, j) == FLUIDCELL)
 					poisson(i, j, 1) = -1;
 			}
-		}
-		if (marker(i, j - 1) != SOLIDCELL)
-			poisson(i, j, 0) += 1;
-		if (marker(i, j + 1) != SOLIDCELL)
-		{
-			poisson(i, j, 0) += 1;
-			if (marker(i, j + 1) == FLUIDCELL)
-				poisson(i, j, 2) = -1;
+
+			if (marker(i, j - 1) != SOLIDCELL)
+				poisson(i, j, 0) += 1;
+			if (marker(i, j + 1) != SOLIDCELL)
+			{
+				poisson(i, j, 0) += 1;
+				if (marker(i, j + 1) == FLUIDCELL)
+					poisson(i, j, 2) = -1;
+			}
 		}
 	}
 }
@@ -318,8 +319,10 @@ void Grid::apply_poisson(const Array2<double> &x, Array2<double> &y)
 	{
 		if (marker(i, j) == FLUIDCELL)
 		{
-			y(i, j) = poisson(i, j, 0)*x(i, j) + poisson(i - 1, j, 1)*x(i - 1, j)
-					+ poisson(i, j, 1)*x(i + 1, j) + poisson(i, j - 1, 2)*x(i, j - 1)
+			y(i, j) = poisson(i, j, 0)*x(i, j) 
+					+ poisson(i - 1, j, 1)*x(i - 1, j)
+					+ poisson(i, j, 1)*x(i + 1, j) 
+					+ poisson(i, j - 1, 2)*x(i, j - 1)
 					+ poisson(i, j, 2)*x(i, j+1);
 		}
 	}

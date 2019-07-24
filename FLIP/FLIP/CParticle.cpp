@@ -45,20 +45,21 @@ void Particle::accumulate(T &accum, float q, int i, int j, float fx, float fy)
 	sum(i+1, j+1) += weight;
 }
 
-void Particle::move_particles_in_grid(float dt)
+void Particle::move_particles_in_grid(float dt)//0.2*dt
 {
-	Vec2<float> midx, gu;
+	//a particle moves less than one grid cell in each substep
+	Vec2<float> midx, gridu;
 	float xmin = 1.001*grid.h, xmax = grid.lx - 1.001*grid.h;
 	float ymin = 1.001*grid.h, ymax = grid.ly - 1.001*grid.h;
 	for (int p = 0; p < num; p++)
 	{
-		grid.bilerp_uv(x[p][0], x[p][1], gu[0], gu[1]);
-		midx = x[p] + 0.5*dt*gu;
+		grid.bilerp_uv(x[p][0], x[p][1], gridu[0], gridu[1]);
+		midx = x[p] + 0.5*dt*gridu;
 		clamp(midx[0], xmin, xmax);
 		clamp(midx[1], ymin, ymax);
 		//
-		grid.bilerp_uv(midx[0], midx[1], gu[0], gu[1]);
-		x[p] += dt*gu;
+		grid.bilerp_uv(midx[0], midx[1], gridu[0], gridu[1]);
+		x[p] += dt*gridu;
 		clamp(x[p][0], xmin, xmax);
 		clamp(x[p][1], ymin, ymax);
 	}
@@ -77,11 +78,13 @@ void Particle::transfer_to_grid()
 		grid.bary_y_centre(x[p][1], j, fy);
 		accumulate(grid.u, u[p][0], ui, j, ufx, fy);
 	}
-	for (j = 0; j < grid.u.ny; j++) for (i = 0; i < grid.u.nx; i++)
+	for (j = 0; j < grid.u.ny; j++)
 	{
-		if (sum(i, j) != 0) grid.u(i, j) /= sum(i, j);
+		for (i = 0; i < grid.u.nx; i++)
+		{
+			if (sum(i, j) != 0) grid.u(i, j) /= sum(i, j);
+		}
 	}
-
 	grid.v.zero();
 	sum.zero();
 	for (p = 0; p < num; p++)

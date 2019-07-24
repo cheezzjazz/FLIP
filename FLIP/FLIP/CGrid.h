@@ -30,7 +30,7 @@ public:
 	Array2<float> u, v;
 	Array2<float> du, dv; // differences for particle update
 	Array2<CellType> marker; //identifies what sort of cell we have
-	Array2<float> phi;
+	Array2<float> phi;	//distance field(phi)
 	Array2<double> pressure;
 	//
 	Array2x3<float> poisson;

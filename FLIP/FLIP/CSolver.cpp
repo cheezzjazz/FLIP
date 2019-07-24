@@ -13,8 +13,8 @@ Solver::~Solver()
 {
 	if(m_particles != NULL)
 		delete m_particles;
-	if(m_grid != NULL)
-		delete m_grid;
+	//if(m_grid != NULL)
+	//	delete m_grid;
 }
 
 void Solver::init(int gridsize_)
@@ -34,6 +34,7 @@ void Solver::init(int gridsize_, Grid &grid_, Particle &particles_)
 
 void Solver::update()
 {
+	advance_one_frame(*m_grid, *m_particles);
 }
 
 void Solver::update(float *ptr, float * vertices)
@@ -41,16 +42,19 @@ void Solver::update(float *ptr, float * vertices)
 	if (!ptr || !vertices)
 		return;
 
-	stepFLIP();
+	//stepFLIP();
+	update();
 
 	for (int p = 0; p < m_particle_count; p++)
 	{
 		*vertices = m_particles->x[p][0];
 		*ptr = *vertices;
-		std::cout << "[x," << p << "] = " << *ptr << "," << *vertices << std::endl; ++ptr; ++vertices;
+		//std::cout << "[x," << p << "] = " << *ptr << "," << *vertices << std::endl;
+		++ptr; ++vertices;
 		*vertices = m_particles->x[p][1];
 		*ptr = *vertices;
-		std::cout << "[y," << p << "] = " << *ptr << "," << *vertices << std::endl; ++ptr; ++vertices;
+		//std::cout << "[y," << p << "] = " << *ptr << "," << *vertices << std::endl;
+		++ptr; ++vertices;
 	}
 }
 
@@ -60,7 +64,7 @@ void Solver::stepPIC()
 
 void Solver::stepFLIP()
 {
-	advance_one_frame(*m_grid, *m_particles, 1./30);
+	advance_one_frame(*m_grid, *m_particles, 1./15);
 }
 
 void Solver::stepPICFLIP()
@@ -108,6 +112,23 @@ void Solver::init_water_drop(Grid & grid, Particle & particles, int na, int nb)
 					particles.add_particle(Vec2<float>(x, y), Vec2<float>(0, 0));
 				}
 			}
+		}
+	}
+}
+
+void Solver::advance_one_frame(Grid & grid, Particle & particles)
+{
+	m_particle_count = 0;
+	double dt = 0.01;
+	bool finished = false;
+	while (!finished)
+	{
+		advanced_one_step(grid, particles, dt);
+
+		//if()
+		{
+			finished = true;
+			m_particle_count = particles.num;
 		}
 	}
 }
