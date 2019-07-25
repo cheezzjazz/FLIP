@@ -22,7 +22,8 @@ void Solver::init(int gridsize_)
 	m_grid = new Grid(9.8, gridsize_, gridsize_, 1);
 	m_particles = new Particle(*m_grid);
 
-	init_water_drop(*m_grid, *m_particles, 2, 2);
+	//init_water_drop(*m_grid, *m_particles, 2, 2);
+	init_water_dam(*m_grid, *m_particles, 2, 2);
 }
 
 void Solver::init(int gridsize_, Grid &grid_, Particle &particles_)
@@ -113,6 +114,62 @@ void Solver::project(Grid &grid, float &x, float &y, float current, float target
 	float scale = (target - current) / sqrt(dpdx*dpdx + dpdy*dpdy);
 	x += scale*dpdx;
 	y += scale*dpdy;
+}
+
+void Solver::init_water_dam(Grid &grid, Particle &particles, int na, int nb)
+{
+	float x, y, phi;
+
+	for (int i = 1; i < (grid.marker.nx - 1)/4; i++)	//except for boundary
+	{
+		for (int j = 1; j < (grid.marker.ny - 1)*2/3; j++)
+		{
+			for (int a = 0; a < na; ++a)
+			{
+				for (int b = 0; b < nb; ++b)
+				{
+					x = (i + (a + 0.1f + 0.8f*rand() / (float)RAND_MAX) / na) * grid.h; //0.0~0.8 random, random seeding
+					y = (j + (b + 0.1f + 0.8f*rand() / (float)RAND_MAX) / na) * grid.h;
+					phi = fluidphi(grid, x, y);
+					/*if (phi > -0.25*grid.h / na)
+						continue;
+					else if (phi > -1.5 * grid.h / na)
+					{
+						project(grid, x, y, phi, -0.75*grid.h / na);
+						phi = fluidphi(grid, x, y);
+						project(grid, x, y, phi, -0.75*grid.h / na);
+						phi = fluidphi(grid, x, y);
+					}*/
+					particles.add_particle(Vec2<float>(x, y), Vec2<float>(0, 0));
+				}
+			}
+		}
+	}
+	//for (int i = (grid.marker.nx - 1); i > (grid.marker.nx - 1) * 3 / 4; i--)	//except for boundary
+	//{
+	//	for (int j = 1; j < (grid.marker.ny - 1) * 2 / 3; j++)
+	//	{
+	//		for (int a = 0; a < na; ++a)
+	//		{
+	//			for (int b = 0; b < nb; ++b)
+	//			{
+	//				x = (i + (a + 0.1f + 0.8f*rand() / (float)RAND_MAX) / na) * grid.h; //0.0~0.8 random, random seeding
+	//				y = (j + (b + 0.1f + 0.8f*rand() / (float)RAND_MAX) / na) * grid.h;
+	//				phi = fluidphi(grid, x, y);
+	//				/*if (phi > -0.25*grid.h / na)
+	//				continue;
+	//				else if (phi > -1.5 * grid.h / na)
+	//				{
+	//				project(grid, x, y, phi, -0.75*grid.h / na);
+	//				phi = fluidphi(grid, x, y);
+	//				project(grid, x, y, phi, -0.75*grid.h / na);
+	//				phi = fluidphi(grid, x, y);
+	//				}*/
+	//				particles.add_particle(Vec2<float>(x, y), Vec2<float>(0, 0));
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void Solver::init_water_drop(Grid & grid, Particle & particles, int na, int nb)

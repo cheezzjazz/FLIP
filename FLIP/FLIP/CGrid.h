@@ -16,10 +16,7 @@ public:
 	Grid();
 	Grid(float gravity_, int cell_nx, int cell_ny, float lx_);
 	~Grid();
-
-	unsigned int grid_width = 100;
-	unsigned int grid_height = 100;
-
+	
 	//cell_nx, cell_ny: grid 전체 screen size
 	// lx, ly : 한 cell 의 x,y 길이
 	float gravity;

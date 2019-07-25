@@ -7,7 +7,7 @@
 #include "CGLFW.h"
 #include "CSolver.h"
 
-#define GRID_SIZE 128
+#define GRID_SIZE 256
 void updateVertices(float* mappedbuffer, float* srcvertices, int count)
 {
 	if (!mappedbuffer || !srcvertices)
