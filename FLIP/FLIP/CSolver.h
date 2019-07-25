@@ -18,6 +18,7 @@ public:
 
 	void update();
 	void update(float * ptr, float * vertices);
+	void update(float * ptr, float * vertices, const unsigned int width, const unsigned int height);
 	void stepPIC();
 	void stepFLIP();
 	void stepPICFLIP();

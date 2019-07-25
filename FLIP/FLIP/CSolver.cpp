@@ -42,8 +42,8 @@ void Solver::update(float *ptr, float * vertices)
 	if (!ptr || !vertices)
 		return;
 
-	//stepFLIP();
-	update();
+	stepFLIP();
+	//update();
 
 	for (int p = 0; p < m_particle_count; p++)
 	{
@@ -58,13 +58,43 @@ void Solver::update(float *ptr, float * vertices)
 	}
 }
 
+void Solver::update(float *ptr, float * vertices, const unsigned int width_, const unsigned int height_)
+{
+	if (!ptr || !vertices)
+		return;
+
+	//stepFLIP();
+	update();
+
+	float x, y;/*
+	float Width = width_ - 1;
+	float Height = height_ - 1;
+	if (Width == 0 || Height == 0)
+		std::cout << "ERROR::SOLVER::UPDATE:: divied by 0 value!" << std::endl;*/
+	for (int p = 0; p < m_particle_count; p++)
+	{
+		x = m_particles->x[p][0];
+		y = m_particles->x[p][1];
+		//change to NDC
+		*vertices = 2.0f*(x)- 1.0f;
+		*ptr = *vertices;
+		//std::cout << "화면 x:"<<x<<"정규:[x," << p << "] = " << *ptr << ","  << std::endl;
+		++ptr; ++vertices;
+		
+		*vertices = 2.0f*(y)  - 1.0f;
+		*ptr = *vertices;
+		//std::cout << "화면 y:" << y << "정규:[y," << p << "] = " << *ptr << ",\n"<< std::endl;
+		++ptr; ++vertices;
+	}
+}
+
 void Solver::stepPIC()
 {
 }
 
 void Solver::stepFLIP()
 {
-	advance_one_frame(*m_grid, *m_particles, 1./15);
+	advance_one_frame(*m_grid, *m_particles, 1./10);
 }
 
 void Solver::stepPICFLIP()
@@ -151,12 +181,21 @@ void Solver::advance_one_frame(Grid & grid, Particle & particles, double frameti
 		else if (t + 1.5*dt >= frametime)
 		{
 			dt = 0.5*(frametime - t);
-			std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
+			//std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
+			advanced_one_step(grid, particles, dt);
+			t += dt;
+		}
+		else
+		{
+			dt = 0.01*(frametime - t);
+		//std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
 			advanced_one_step(grid, particles, dt);
 			t += dt;
 		}
 	}
 }
+
+
 
 void Solver::advanced_one_step(Grid & grid, Particle & particle, double dt)
 {

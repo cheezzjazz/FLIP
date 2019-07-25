@@ -7,7 +7,7 @@
 #include "CGLFW.h"
 #include "CSolver.h"
 
-#define GRID_SIZE 64
+#define GRID_SIZE 128
 void updateVertices(float* mappedbuffer, float* srcvertices, int count)
 {
 	if (!mappedbuffer || !srcvertices)
@@ -88,11 +88,11 @@ int main()
 	
 	//draw buffer
 	int nFrame = 100;
-	while (!ourGlfw.getWindowShouldClose() && nFrame != 0)
+	while (!ourGlfw.getWindowShouldClose())// && nFrame != 0)
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		std::cout << "Frame [" << nFrame << "] \n";
+		//std::cout << "Frame [" << nFrame << "] \n";
 
 		ourGlfw.processInput();
 		ourShader.use();
@@ -102,12 +102,13 @@ int main()
 		if (ptr)
 		{
 			//ourSolver.stepFLIP();
-			ourSolver.update(ptr, vertices);
+			//ourSolver.update(ptr, vertices);
+			ourSolver.update(ptr, vertices, ourGlfw.scr_width, ourGlfw.scr_height);
 			//updateVertices(ptr, vertices, particlecnt);
 			glUnmapBuffer(GL_ARRAY_BUFFER);
 		}
 
-		glPointSize(5.0f);
+		glPointSize(2.0f);
 		glDrawArrays(GL_POINTS, 0, particlecnt);
 	
 		ourGlfw.swapBuffers();
