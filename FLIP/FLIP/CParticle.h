@@ -15,8 +15,8 @@ public:
 	void init(Grid &grid_);
 	Grid &grid;
 	int num; // number of particles
-	std::vector<Vec2<float>> x, u; //positions, and velocities
-
+	std::vector<Vec2<float>> x, u, u_pic, u_flip; //positions, and velocities
+	
 	//for transfer
 	Array2<float> sum;
 

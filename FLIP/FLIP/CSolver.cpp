@@ -95,7 +95,7 @@ void Solver::stepPIC()
 
 void Solver::stepFLIP()
 {
-	advance_one_frame(*m_grid, *m_particles, 1./10);
+	advance_one_frame(*m_grid, *m_particles, 1./20);
 }
 
 void Solver::stepPICFLIP()
@@ -238,17 +238,17 @@ void Solver::advance_one_frame(Grid & grid, Particle & particles, double frameti
 		else if (t + 1.5*dt >= frametime)
 		{
 			dt = 0.5*(frametime - t);
-			//std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
+			std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
 			advanced_one_step(grid, particles, dt);
 			t += dt;
 		}
-		else
-		{
-			dt = 0.01*(frametime - t);
-		//std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
-			advanced_one_step(grid, particles, dt);
-			t += dt;
-		}
+		//else
+		//{
+		//	dt = 0.01*(frametime - t);
+		////std::cout << "advancing " << dt << "(to " << 100 * (t + dt) / frametime << "of frame)" << std::endl;
+		//	advanced_one_step(grid, particles, dt);
+		//	t += dt;
+		//}
 	}
 }
 

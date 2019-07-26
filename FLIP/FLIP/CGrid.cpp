@@ -41,7 +41,7 @@ float Grid::CFL()
 {
 	float maxv2 = max(h*gravity, sqr(u.infnorm()) + sqr(v.infnorm()));
 	if (maxv2 < 1e-16) maxv2 = 1e-16;
-	return h/sqrt(maxv2);
+	return h/sqrt(maxv2);	//cell_width(h) / maximum velocity
 }
 
 void Grid::bilerp_uv(float px, float py, float & pu, float & pv)
@@ -171,9 +171,9 @@ void Grid::sweep_velocity()
 	}
 
 	sweep_v(1, v.nx - 1, 1, v.ny - 1);
-	sweep_u(1, v.nx - 1, v.ny - 2, 0);
-	sweep_u(v.nx - 2, 0, 1, v.ny - 1);
-	sweep_u(v.nx - 2, 0, v.ny - 2, 0);
+	sweep_v(1, v.nx - 1, v.ny - 2, 0);
+	sweep_v(v.nx - 2, 0, 1, v.ny - 1);
+	sweep_v(v.nx - 2, 0, v.ny - 2, 0);
 	for (i = 0; i < v.nx; i++)
 	{
 		v(i, 0) = v(i, 1); v(i, v.ny - 1) = v(i, v.ny - 2);
@@ -230,6 +230,7 @@ void Grid::apply_boundary_conditions()
 	for (j = 0; j<u.ny; ++j)
 		u(0, j) = u(1, j) = u(u.nx - 1, j) = u(u.nx - 2, j) = 0;
 	
+
 	for (i = 0; i<v.nx; ++i)
 		v(i, 0) = v(i, 1) = v(i, v.ny - 1) = v(i, v.ny - 2) = 0;
 }
@@ -239,7 +240,7 @@ void Grid::make_incompressible()
 	find_divergence();
 	form_poisson();
 	form_preconditioner();
-	solve_pressure(100, 1e-5);
+	solve_pressure(150, 1e-5);
 	add_gradient();
 }
 
@@ -315,7 +316,7 @@ void Grid::form_preconditioner()
 void Grid::apply_poisson(const Array2<double> &x, Array2<double> &y)
 {
 	y.zero();
-	for (int j = 1; j < poisson.ny - 1; j++) for (int i = 1; i < poisson.nx - 1; i++)
+	for (int j = 1; j < poisson.ny - 1; ++j) for (int i = 1; i < poisson.nx - 1; ++i)
 	{
 		if (marker(i, j) == FLUIDCELL)
 		{

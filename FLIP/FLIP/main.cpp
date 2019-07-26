@@ -87,7 +87,7 @@ int main()
 	glBindVertexArray(VAO);
 	
 	//draw buffer
-	int nFrame = 100;
+	int nFrame = 1;
 	while (!ourGlfw.getWindowShouldClose())// && nFrame != 0)
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -96,16 +96,20 @@ int main()
 
 		ourGlfw.processInput();
 		ourShader.use();
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		float * ptr = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-		if (ptr)
+		if (ourGlfw.isStart)
 		{
-			//ourSolver.stepFLIP();
-			//ourSolver.update(ptr, vertices);
-			ourSolver.update(ptr, vertices, ourGlfw.scr_width, ourGlfw.scr_height);
-			//updateVertices(ptr, vertices, particlecnt);
-			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			float * ptr = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+			if (ptr)
+			{
+			
+				//ourSolver.stepFLIP();
+				//ourSolver.update(ptr, vertices);
+				ourSolver.update(ptr, vertices, ourGlfw.scr_width, ourGlfw.scr_height);
+				//updateVertices(ptr, vertices, particlecnt);
+				glUnmapBuffer(GL_ARRAY_BUFFER);
+				++nFrame;
+			}
 		}
 
 		glPointSize(2.0f);
@@ -114,7 +118,7 @@ int main()
 		ourGlfw.swapBuffers();
 		
 		Sleep(100);
-		--nFrame;
+		
 	}
 
 	glDeleteBuffers(1, &VBO);

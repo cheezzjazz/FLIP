@@ -20,6 +20,8 @@ void Particle::add_particle(const Vec2<float>& px, const Vec2<float>& pu)
 {
 	x.push_back(px);
 	u.push_back(pu);
+	u_flip.push_back(pu);
+	u_pic.push_back(pu);
 	++num;
 }
 
@@ -113,12 +115,18 @@ void Particle::update_from_grid()
 	int p;
 	int i, ui, j, vj;
 	float fx, ufx, fy, vfy;
+	double weight = 0.05;
 	for (p = 0; p < num; p++)
 	{
 		grid.bary_x(x[p][0], ui, ufx);
 		grid.bary_x_centre(x[p][0], i, fx);
 		grid.bary_y(x[p][1], vj, vfy);
 		grid.bary_y_centre(x[p][1], j, fy);
-		u[p] += Vec2<float>(grid.du.bilerp(ui, j, ufx, fy), grid.dv.bilerp(i, vj, fx, vfy)); //FLIP
+//		u[p] += Vec2<float>(grid.du.bilerp(ui, j, ufx, fy), grid.dv.bilerp(i, vj, fx, vfy)); //FLIP
+		u_pic[p] = Vec2<float>(grid.u.bilerp(ui, j, ufx, fy), grid.v.bilerp(i, vj, fx, vfy));	//PIC
+		u_flip[p] = u[p] + Vec2<float>(grid.du.bilerp(ui, j, ufx, fy), grid.dv.bilerp(i, vj, fx, vfy));
+	
+		u[p] = weight*u_pic[p] + (1 - weight)*u_flip[p];
+
 	}
 }
